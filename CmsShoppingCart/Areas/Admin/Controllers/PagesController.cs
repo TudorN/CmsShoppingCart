@@ -120,6 +120,71 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             //Return view with model
             return View(model);
         }
-       
+
+        [HttpPost]
+        public ActionResult EditPage(PageVM model)
+        {
+            //Check model state
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            using (Db db = new Db())
+            {
+                //Get page id
+                int id = model.Id;
+
+                //init slug
+                string slug = "home";
+
+                //Inint pageDTO
+                PageDTO dto = db.Pages.Find(id);
+
+                //DTO title
+                dto.Title = model.Title;
+
+                //Check for an set slug if need be
+                if (model.Slug != "home")
+                {
+                    if (string.IsNullOrWhiteSpace(model.Slug))
+                    {
+                        slug = model.Title.Replace(" ", "-").ToLower();
+                    }
+                    else
+                    {
+                        slug = model.Slug.Replace(" ", "-").ToLower();
+                    }
+                }
+
+
+                //Make sure title and slug are unique
+                if (db.Pages.Where(x => x.Id != id).Any(x => x.Title == model.Title)||
+                    db.Pages.Where(x => x.Id != id).Any(x => x.Slug == slug))
+                {
+                    ModelState.AddModelError("", "That title or slug already exists.");
+                    return View(model);
+                }
+
+                //DTO the rest
+                dto.Slug = slug;
+                dto.Body = model.Body;
+                dto.HasSidebar = model.HasSidebar;
+           
+
+
+                //Save DTO
+                db.SaveChanges();
+                
+            }
+
+            //Set TempData message
+            TempData["SM"] = "You have edited the page!";
+
+            //Redirect
+            return RedirectToAction("EditPage");
+
+        }
+
     }
 }
