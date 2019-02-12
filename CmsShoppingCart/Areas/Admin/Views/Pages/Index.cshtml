@@ -17,8 +17,8 @@
 else
 {
 
-    <table class="table">
-        <tr>
+    <table class="table sorting" id="pages">
+        <tr class="home">
             <th>
                 Title
             </th>
@@ -33,7 +33,7 @@ else
 
         @foreach (var item in Model)
         {
-            <tr>
+            <tr id="id_@item.Id" class="@item.Slug">
                 <td>
                     @Html.DisplayFor(modelItem => item.Title)
                 </td>
@@ -48,7 +48,7 @@ else
                     @Html.ActionLink("Details", "PageDetails", new { id = item.Id }) |
                     @if (item.Slug != "home")
                     {
-                        @Html.ActionLink("Delete", "DeletePage", new { id = item.Id }, new { @class = "delete"})
+                        @Html.ActionLink("Delete", "DeletePage", new { id = item.Id }, new { @class = "delete" })
                     }
                 </td>
             </tr>
@@ -58,14 +58,40 @@ else
     </table>
 
     @section Scripts{
-    <script>
-        $(function () {
-            $("a.delete").click(function () {
-                if (!confirm("Confirm page deletion")) return false;
+        <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+        <script>
+            $(function () {
+
+                /*
+                 *Confirm page deletion
+                 */
+
+                $("a.delete").click(function () {
+                    if (!confirm("Confirm page deletion")) return false;
+                });
+
+                //////////////////////////////////////////////////////////////
+
+                /*
+                *Confirm page deletion
+                */
+
+                $("table#pages tbody").sortable({
+                    items: "tr:not(.home)",
+                    placeholder: "ui-state-highlight",
+                    update: function () {
+                        var ids = $("table#pages tbody").sortable("serialize");
+                        var url = "/Admin/Pages/ReorderPages";
+
+                        $.post(url, ids, function (data) {
+                        });
+                    }
+                });
+
+                //////////////////////////////////////////////////////////////
             });
-        });
-    </script>
-        
-        }
+        </script>
+
+    }
 }
 

@@ -236,5 +236,32 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             //Redirect
             return RedirectToAction("Index");
         }
+
+        //POST: Admin/Pages/ReorderPages/Id
+        [HttpPost]
+        public void ReorderPages(int[] id)
+        {
+            using (Db db = new Db())
+            {
+                //Set initial count
+                int count = 1;
+
+                //Declare page DTO
+                PageDTO dto;
+
+                //Set sorting foreach page
+                foreach (var pageId in id)
+                {
+                    dto = db.Pages.Find(pageId);
+                    dto.Sorting = count;
+
+                    db.SaveChanges();
+
+                    count++;
+
+                }
+
+            }
+        }
     }
 }
