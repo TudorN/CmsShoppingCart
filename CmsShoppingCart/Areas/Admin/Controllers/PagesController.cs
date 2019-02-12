@@ -121,6 +121,8 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             return View(model);
         }
 
+
+        // POST: Admin/Pages/EditPage/Id
         [HttpPost]
         public ActionResult EditPage(PageVM model)
         {
@@ -184,6 +186,34 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             //Redirect
             return RedirectToAction("EditPage");
 
+        }
+
+        // GET: Admin/Pages/PageDetails/Id
+        public ActionResult PageDetails(int id)
+        {
+            //Declare pageVM
+            PageVM model;
+
+
+            using (Db db = new Db())
+            {
+                //Get the page
+                PageDTO dto = db.Pages.Find(id);
+
+                //Confirm page exists
+                if (dto == null)
+                {
+                    return Content("The page does not exist");
+                }
+
+                //Init pageVM
+                model = new PageVM(dto);
+
+            }
+
+
+            //Return view with model
+            return View(model);
         }
 
     }
