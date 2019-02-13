@@ -22,7 +22,7 @@
 }
 else
 {
-    <table class="table sorting" id="pages">
+    <table class="table sorting categories" id="pages">
         <tr class="home">
             <th>
                 @Html.DisplayNameFor(model => model.Name)
@@ -32,7 +32,7 @@ else
 
         @foreach (var item in Model)
         {
-            <tr>
+            <tr id="id_@item.Id" class="@item.Slug">
                 <td>
                     @Html.EditorFor(modelItem => item.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
                 </td>
@@ -140,21 +140,13 @@ else
          });
 
      });
-       
-    //////////////////////////////////////////////////////////////
+     /////////////////////////////////////////////////////////////
 
-    /*
-        *Confirm page deletion
-        */
-
-    $("a.delete").click(function () {
-        if (!confirm("Confirm page deletion")) return false;
-    });
 
     //////////////////////////////////////////////////////////////
 
     /*
-    *Confirm page deletion
+    *Category list sort-drag-and drop functionality
     */
 
     $("table#pages tbody").sortable({
@@ -162,14 +154,31 @@ else
         placeholder: "ui-state-highlight",
         update: function () {
             var ids = $("table#pages tbody").sortable("serialize");
-            var url = "/Admin/Pages/ReorderPages";
+            var url = "/Admin/Shop/ReorderCategories";
 
             $.post(url, ids, function (data) {
             });
         }
     });
 
-                //////////////////////////////////////////////////////////////
+     //////////////////////////////////////////////////////////////
+
+
+     //////////////////////////////////////////////////////////////
+
+     /*
+         *Confirm page deletion
+         */
+
+     //$("a.delete").click(function () {
+     //    if (!confirm("Confirm page deletion")) return false;
+     //});
+
+     $("body").on("click", "a.delete", function () {
+         if (!confirm("Confirm page deletion")) {
+             return false;
+         }
+     });//this deleting solution is for dynamically added rows.
 });
     </script>
 

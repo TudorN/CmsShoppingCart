@@ -4,6 +4,7 @@
 
 .ui-state-highlight {
     border: 1px dashed #ccc;
+
 }
 
 div.new-cat {
@@ -13,4 +14,9 @@ div.new-cat {
 
 span.ajax-text {
     display: none;
+}
+
+table.sorting.categories td {
+    padding:20px; !important;
+
 }

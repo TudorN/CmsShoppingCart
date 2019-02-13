@@ -62,5 +62,53 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             //Return the id
             return id;
         }
+
+        //POST: Admin/Shop/ReorderCategories/Id
+        [HttpPost]
+        public void ReorderCategories(int[] id)
+        {
+            using (Db db = new Db())
+            {
+                //Set initial count
+                int count = 1;
+
+                //Declare page DTO
+                CategoryDTO dto;
+
+                //Set sorting foreach page
+                foreach (var catId in id)
+                {
+                    dto = db.Categories.Find(catId);
+                    dto.Sorting = count;
+
+                    db.SaveChanges();
+
+                    count++;
+
+                }
+
+            }
+        }
+
+        // GET: Admin/Shop/DeleteCategory/Id
+        public ActionResult DeleteCategory(int id)
+        {
+
+            using (Db db = new Db())
+            {
+                // Get the page
+                CategoryDTO dto = db.Categories.Find(id);
+
+                //Remove the page
+                db.Categories.Remove(dto);
+
+                //Save
+                db.SaveChanges();
+
+            }
+
+            //Redirect
+            return RedirectToAction("Categories");
+        }
     }
 }
