@@ -34,6 +34,7 @@ else
         {
             <tr id="id_@item.Id" class="@item.Slug">
                 <td>
+                    <div class="ajaxdivtd"></div>
                     @Html.EditorFor(modelItem => item.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
                 </td>
                 <td>
@@ -141,10 +142,7 @@ else
 
      });
      /////////////////////////////////////////////////////////////
-
-
-    //////////////////////////////////////////////////////////////
-
+              
     /*
     *Category list sort-drag-and drop functionality
     */
@@ -162,13 +160,10 @@ else
     });
 
      //////////////////////////////////////////////////////////////
-
-
-     //////////////////////////////////////////////////////////////
-
+               
      /*
-         *Confirm page deletion
-         */
+      *Confirm page deletion
+      */
 
      //$("a.delete").click(function () {
      //    if (!confirm("Confirm page deletion")) return false;
@@ -179,6 +174,65 @@ else
              return false;
          }
      });//this deleting solution is for dynamically added rows.
+
+     //////////////////////////////////////////////////////////////
+
+     /*
+      *Rename category
+      */
+     //store the original text box value in case
+     //something goes wrong
+     var originalTextBoxValue;
+
+     //make the readonly attribute of the textbox "false" on dbclick
+     $("table#pages input.text-box").dblclick(function () {
+         originalTextBoxValue = $(this).val();
+         $(this).attr("readonly", false);
+     });
+
+     //trigger the blur event when pressing enter key code 13
+     $("table#pages input.text-box").keyup(function (e) {
+         if (e.keyCode == 13) {
+             $(this).blur();
+         }
+     });
+
+     //handle the blur event
+     $("table#pages input.text-box").blur(function () {
+         var $this = $(this);
+         var ajaxdiv = $this.parent().find(".ajaxdivtd");
+         var newCatName = $this.val();
+         var id = $this.parent().parent().attr("id").substring(3); 
+         var url = "/admin/shop/RenameCategory";
+
+         //check for approved length
+         if (newCatName.length < 2) {
+             alert("Category name must be at least 2 characters long.");
+             $this.attr("readonly", true);
+             return false;
+         }
+
+         $.post(url, { newCatName: newCatName, id: id }, function (data) {
+             var response = data.trim();/*removing spaces...*/
+
+             //check for titletaken set the inputbox to its original value in case the title is taken
+             if (response == "titletaken") {
+                 $this.val(originalTextBoxValue);
+                 ajaxdiv.html("<span class='alert alert-danger'>That title is taken!</span>").show();
+             } else {
+                 ajaxdiv.html("<span class='alert alert-success'>The category name has been changed!</span>").show();
+             }
+
+             setTimeout(function () {
+                 ajaxdiv.fadeOut("fast", function () {
+                     ajaxdiv.html("");
+                 });
+             }, 2000);
+         }).done(function () {
+             $this.attr("readonly", true);
+         });
+     });
+     ////////////////////////////////////////////////////////////////
 });
     </script>
 
