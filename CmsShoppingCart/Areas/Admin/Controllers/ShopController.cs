@@ -27,7 +27,7 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
                                     .Select(x => new CategoryVM(x))
                                     .ToList();
 
-                
+
             }
 
             //Return view with list
@@ -49,7 +49,7 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
                 //Init DTO
                 CategoryDTO dto = new CategoryDTO();
 
-               //Add to DTO
+                //Add to DTO
                 dto.Name = catName;
                 dto.Slug = catName.Replace(" ", "-").ToLower();
                 dto.Sorting = 100;
@@ -123,7 +123,7 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
                 //Check category name is unique
                 if (db.Categories.Any(x => x.Name == newCatName))
                     return "titletaken";
-                              
+
                 //Get DTO
                 CategoryDTO dto = db.Categories.Find(id);
 
@@ -157,7 +157,7 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             //Return view with model
             return View(model);
 
-   
+
         }
 
         // POST: Admin/Shop/AddProduct
@@ -177,7 +177,7 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             // Make sure product name is unique
             using (Db db = new Db())
             {
-                if (db.Products.Any(x=>x.Name ==  model.Name))
+                if (db.Products.Any(x => x.Name == model.Name))
                 {
                     model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
                     ModelState.AddModelError("", "That product name is taken!");
@@ -220,8 +220,8 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             var originalDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
 
             var pathString1 = Path.Combine(originalDirectory.ToString(), "Products");
-            var pathString2 = Path.Combine(originalDirectory.ToString(), "Products\\" +id.ToString() );
-            var pathString3 = Path.Combine(originalDirectory.ToString(), "Products\\" +id.ToString()  + "\\Thumbs");
+            var pathString2 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString());
+            var pathString3 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString() + "\\Thumbs");
             var pathString4 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString() + "\\Gallery");
             var pathString5 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString() + "\\Gallery\\Thumbs");
 
@@ -245,7 +245,7 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
 
 
             // Check if a file was uploaded
-            if (file !=null && file.ContentLength > 0)
+            if (file != null && file.ContentLength > 0)
             {
 
 
@@ -258,7 +258,7 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
                     ext != "image/pjpeg" &&
                     ext != "image/gif" &&
                     ext != "image/x-png" &&
-                    ext != "image/png" )
+                    ext != "image/png")
                 {
                     using (Db db = new Db())
                     {
@@ -332,6 +332,162 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             // Return view with list
             return View();
         }
+
+        // GET: Admin/Shop/EditProduct/id
+        [HttpGet]
+        public ActionResult EditProduct(int id)
+        {
+            // Declare productVM
+            ProductVM model;
+
+            using (Db db = new Db())
+            {
+                // Get the product
+                ProductDTO dto = db.Products.Find(id);
+
+                // Make sure product exists
+                if (dto == null)
+                {
+                    return Content("That product does not exist.");
+                }
+
+                // init the model
+                model = new ProductVM(dto);
+
+                // Make a select list
+                model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
+
+                // Get all gallery images (the file name/s of that image/s)
+                model.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs"))
+                                                .Select(fn => Path.GetFileName(fn));
+            }
+
+            // Return view with model
+            return View(model);
+        }
+
+        // GET: Admin/Shop/EditProduct/id
+        [HttpPost]
+        public ActionResult EditProduct(ProductVM model, HttpPostedFileBase file)
+        {
+            // Get product id
+            int id = model.Id;
+
+            // Populate categories select list and gallery images
+            using (Db db = new Db())
+            {
+                model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
+            }
+            model.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs"))
+                                            .Select(fn => Path.GetFileName(fn));
+
+            // Check model state
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // Make sure product name is unique
+            using (Db db = new Db())
+            {
+                if (db.Products.Where(x => x.Id != id).Any(x => x.Name == model.Name))
+                {
+                    ModelState.AddModelError("", "That product name is taken!");
+                    return View(model);
+                }
+            }
+
+            // Update product
+            using (Db db = new Db())
+            {
+                ProductDTO dto = db.Products.Find(id);
+
+                dto.Name = model.Name;
+                dto.Description = model.Description;
+                dto.Slug = model.Name.Replace(" ", "-").ToLower();
+                dto.Price = model.Price;
+                dto.CategoryId = model.CategoryId;             
+                dto.ImageName = model.ImageName;
+
+                CategoryDTO catDTO = db.Categories.FirstOrDefault(x => x.Id == model.CategoryId);
+                dto.CategoryName = catDTO.Name;
+
+                db.SaveChanges();
+            }
+
+            // Set TempData message
+            TempData["SM"] = "You have  edited the product!";
+
+            #region Image Upload
+
+            // Check for file upload 
+            if (file != null && file.ContentLength > 0 )
+            {
+                // Get extension
+                string ext = file.ContentType.ToLower();
+
+                //Verify extension
+                // Verify extension
+                if (ext != "image/jpg" &&
+                    ext != "image/jpeg" &&
+                    ext != "image/pjpeg" &&
+                    ext != "image/gif" &&
+                    ext != "image/x-png" &&
+                    ext != "image/png")
+                {
+                    using (Db db = new Db())
+                    {
+                        ModelState.AddModelError("", "The image was not uploaded - wrong image extension. ");
+                        return View(model);
+                    }
+                }
+
+                // Set upload directory paths
+                var originalDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
+
+                var pathString1 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString());
+                var pathString2 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString() + "\\Thumbs");
+
+                // Delete files from directories
+                DirectoryInfo di1 = new DirectoryInfo(pathString1);
+                DirectoryInfo di2 = new DirectoryInfo(pathString2);
+
+                foreach (FileInfo file2 in di1.GetFiles())
+                    file2.Delete();
+
+                foreach (FileInfo file3 in di2.GetFiles())
+                    file3.Delete();
+
+                // Save image name
+                string imageName = file.FileName;
+
+                using (Db db = new Db())
+                {
+                    ProductDTO dto = db.Products.Find(id);
+                    dto.ImageName = imageName;
+
+                    db.SaveChanges();
+                }
+
+                // Save original and thumb images
+                var path = string.Format("{0}\\{1}", pathString1, imageName);
+                var path2 = string.Format("{0}\\{1}", pathString2, imageName);
+
+                file.SaveAs(path);
+
+                // Create and save thumb
+                WebImage img = new WebImage(file.InputStream);
+                img.Resize(200, 200);
+                img.Save(path2);
+
+            }
+
+            #endregion
+
+            // Redirect 
+            return RedirectToAction("EditProduct");
+        }
+
     }
 
 }
