@@ -60,13 +60,13 @@
                 $@product.Price
             </td>
             <td>
-                <a href="/admin/sho/EditProduct/@product.Id">
+                <a href="/admin/shop/EditProduct/@product.Id">
                     <img src="/Images/Uploads/Products/@product.Id/Thumbs/@product.ImageName" />
                 </a>
             </td>
             <td>
                 @Html.ActionLink("Edit", "EditProduct", new { id = product.Id }) |
-                @Html.ActionLink("Delete", "DeleteProduct", new { id = product.Id })
+                @Html.ActionLink("Delete", "DeleteProduct", new { id = product.Id }, new { @class = "delete"})
             </td>
         </tr>
 
@@ -99,12 +99,12 @@
                 //////////////////////////////////////////////////////////////
 
                 /*
-                *Confirm page deletion
+                *Confirm product deletion
                 */
 
 
                 $("a.delete").click(function () {
-                    if (!confirm("Confirm page deletion")) return false;
+                    if (!confirm("Confirm product deletion")) return false;
                 });
 
                 //////////////////////////////////////////////////////////////
