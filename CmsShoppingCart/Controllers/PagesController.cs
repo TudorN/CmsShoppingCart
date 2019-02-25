@@ -70,5 +70,22 @@ namespace CmsShoppingCart.Controllers
             }
             return PartialView(pageVMList);
         }
+
+        public ActionResult SidebarPartial()
+        {
+            // Delcare model
+            SidebarVM model;
+
+            // Init model
+            using (Db db = new Db())
+            {
+                SidebarDTO dto = db.Sidebar.Find(1);
+
+                model = new SidebarVM(dto);
+            }
+
+            // Return partial view with model
+            return PartialView(model);
+        }
     }
 }

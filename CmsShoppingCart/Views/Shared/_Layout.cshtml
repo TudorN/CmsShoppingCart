@@ -28,13 +28,13 @@
     <div class="container body-content">
         <div class="row">
 
-            @if (ViewBag.Sidebar == "Yest")
+            @if (ViewBag.Sidebar == "Yes")
             {
                 <div class="col-xs-12 col-md-7">
                     @RenderBody()
                 </div>
                 <div class="col-xs-12 col-md-3">
-                    @Html.Action("PagesMenuPartial", "Pages");
+                    @Html.Action("SidebarPartial", "Pages")
                 </div>
             }
             else
