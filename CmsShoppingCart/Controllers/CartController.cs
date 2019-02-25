@@ -1,4 +1,5 @@
-﻿using CmsShoppingCart.Models.ViewModels.Cart;
+﻿using CmsShoppingCart.Models.Data;
+using CmsShoppingCart.Models.ViewModels.Cart;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace CmsShoppingCart.Controllers
             ViewBag.GrandTotal = total;
 
             // Return view with list
-            return View();
+            return View(cart);
         }
 
         public ActionResult CartPartial()
@@ -73,6 +74,63 @@ namespace CmsShoppingCart.Controllers
             
         }
 
-        
+        public ActionResult AddToCartPartial(int id)
+        {
+            // Init CartVM list
+            List<CartVM> cart = Session["cart"] as List<CartVM> ?? new List<CartVM>();
+
+            // Init CartVM
+            CartVM model = new CartVM();
+
+            using (Db db = new Db())
+            {
+                // Get the product
+                ProductDTO product = db.Products.Find(id);
+
+                // Check if the product is already in cart
+                var productInCart = cart.FirstOrDefault(x => x.ProductId == id);
+
+                // If not, add new
+                if (productInCart == null)
+                {
+                    cart.Add(new CartVM()
+                    {
+                        ProductId = product.Id,
+                        ProductName = product.Name,
+                        Quantity = 1,
+                        Price = product.Price,
+                        Image = product.ImageName
+                    });
+                }
+                else
+                {
+                    // If it is, increment
+                    productInCart.Quantity++;
+                }
+
+                // Get total qty and price and add to model
+                int qty = 0;
+                decimal price = 0m;
+
+                foreach (var item in cart)
+                {
+                    qty += item.Quantity;
+                    price += item.Quantity * item.Price;
+                }
+
+                model.Quantity = qty;
+                model.Price = price;
+
+                // Save cart back to session
+                Session["cart"] = cart;
+
+                // Return partial view with model
+                return PartialView(model);
+
+            }
+           
+        }
     }
+
+
 }
