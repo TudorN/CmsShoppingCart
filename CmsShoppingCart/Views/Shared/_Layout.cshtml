@@ -20,7 +20,10 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.Action("PagesMenuPartial", "Pages")</li>
+                    @Html.Action("PagesMenuPartial", "Pages")
+                </ul>
+                <ul class="navbar-collapse collapse navbar-right" >
+                    @Html.Action("CartPartial", "Cart")
                 </ul>
             </div>
         </div>
