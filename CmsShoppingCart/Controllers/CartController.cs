@@ -134,7 +134,7 @@ namespace CmsShoppingCart.Controllers
            
         }
 
-        // GET: /Cart/Increment
+        // GET: /Cart/IncrementProduct
         public JsonResult IncrementProduct(int productId)
         {
             // Init cart list
@@ -156,6 +156,58 @@ namespace CmsShoppingCart.Controllers
             }
 
             
+        }
+
+
+        // GET: /Cart/DecrementProduct
+        public JsonResult DecrementProduct(int productId)
+        {
+            // Init cart list
+            List<CartVM> cart = Session["cart"] as List<CartVM>;
+
+            using (Db db = new Db())
+            {
+                // Get cartVM from list
+                CartVM model = cart.FirstOrDefault(x => x.ProductId == productId);
+
+                
+                if (model.Quantity > 1)
+                {
+                    // Decrement qty
+                    model.Quantity--;
+
+                }
+                else
+                {
+                    model.Quantity = 0;
+                    cart.Remove(model);
+                }
+
+                // Store needed data
+                var result = new { qty = model.Quantity, price = model.Price };
+
+                // Return json with data
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+
+
+        }
+
+        //GET: /Cart/RemoveProduct
+        public void RemoveProduct(int productId)
+        {
+            // Init cart list
+            List<CartVM> cart = Session["cart"] as List<CartVM>;
+
+            using (Db db = new Db())
+            {
+                // Get model from list
+                CartVM model = cart.FirstOrDefault(x => x.ProductId == productId);
+
+                // Remove model from list
+                cart.Remove(model);
+            }
+
         }
     }
 
