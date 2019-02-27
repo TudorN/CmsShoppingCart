@@ -38,8 +38,8 @@
 
         <div class="form-group">
             <label class="control-label col-md-2" for="RememberMe">Remember Me</label>
-            <div class="col-md-10">
-                <div class="checkbox">
+            <div class="col-md-10 ">
+                <div class="checkbox col-md-10">
                     @Html.EditorFor(model => model.RememberMe)
                     @Html.ValidationMessageFor(model => model.RememberMe, "", new { @class = "text-danger" })
                 </div>
