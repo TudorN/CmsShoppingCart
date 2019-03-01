@@ -17,7 +17,7 @@ span.ajax-text {
 }
 
 table.sorting.categories td {
-    padding:20px; !important;
+    padding:20px !important;
 
 }
 .ajaxdivtd {
@@ -44,4 +44,34 @@ span.ajaxmsg {
 
 .ib {
     display: inline-block !important;
+}
+
+ul.adminarea {
+    position: relative;
+    top: 15px;
+}
+
+.ajaxbg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: white;
+    display: none;
+    z-index: 1;
+}
+
+.ajaxbg span {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    
+}
+
+form.paypalform {
+    position: absolute;
+    left: -2000px;
+}
+
+.row {
+    position:relative;
 }
