@@ -75,3 +75,9 @@ form.paypalform {
 .row {
     position:relative;
 }
+.navbar-inverse {
+    background-color: #14479c !important;
+    border-color: #85ff9e !important;
+    color: #14479c !important;
+    background-image: none !important;
+}
