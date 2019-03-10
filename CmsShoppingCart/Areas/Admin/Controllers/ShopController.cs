@@ -101,11 +101,31 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
 
             using (Db db = new Db())
             {
-                // Get the page
-                CategoryDTO dto = db.Categories.Find(id);
 
-                //Remove the page
-                db.Categories.Remove(dto);
+     
+
+
+                // Get the category
+                CategoryDTO dtoCategory = db.Categories.Find(id);
+
+                // Get the productos belonging to the category
+                List<ProductDTO> dtoProducts = db.Products.Where(x => x.CategoryName == dtoCategory.Name).ToList();
+
+               
+                // Check to see if any products where found
+                if (dtoProducts != null)
+                {
+                    foreach (var dtoProduct in dtoProducts)
+                    {
+                        // Remove the product
+                        db.Products.Remove(dtoProduct);
+                    }
+                    
+                }
+
+
+                //Remove the category
+                db.Categories.Remove(dtoCategory);
 
                 //Save
                 db.SaveChanges();
