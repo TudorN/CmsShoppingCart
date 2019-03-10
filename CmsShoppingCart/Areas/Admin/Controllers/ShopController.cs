@@ -115,10 +115,13 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
                 {
                     foreach (var dtoProduct in dtoProducts)
                     {
+
+                        // Check and delete orders if any
+                        DeleteOrders(dtoProduct.Id);
+
                         // Remove the product
                         db.Products.Remove(dtoProduct);
-
-                     
+                
                         // Delete product folder 
                         var originalDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
                         string pathString = Path.Combine(originalDirectory.ToString(), "Products\\" + dtoProduct.Id.ToString());
@@ -525,38 +528,8 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
                 // Find Product
                 ProductDTO dto = db.Products.Find(id);
 
-                // Find all the orders in the order details that have that product
-                List<OrderDetailsDTO> dtoOrdersDetails = db.OrderDetails.Where(x => x.ProductId == id).ToList();
-
-                if (dtoOrdersDetails != null)
-                {
-
-             
-                    // Init a list of Orders
-                    List<OrderDTO> dtoOrders = new List<OrderDTO>();
-
-                    // Find all the orders in the order table accoring to the orderId and fill the dtoOrders list
-                    foreach (var orderDetails in dtoOrdersDetails)
-                    {
-                        dtoOrders = db.Orders.Where(x => x.OrderId == orderDetails.OrderId).ToList();
-                    }
-
-
-                    // Remove the orders from the Orders table
-                    foreach (var order in dtoOrders)
-                    {
-                        db.Orders.Remove(order);
-                    }
-
-                    // Remove the orders from the OrdersDetails table
-                    foreach (var orderDetails in dtoOrdersDetails)
-                    {
-                        db.OrderDetails.Remove(orderDetails);
-                    }
-
-
-                }
-
+                // Check and delete orders if any
+                DeleteOrders(id);
 
                 // Delete product
                 db.Products.Remove(dto);
@@ -691,6 +664,43 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
                 }
             }
             return View(ordersForAdmin);
+        }
+
+        public void DeleteOrders(int id)
+        {
+
+            using (Db db = new Db())
+            {
+                // Find all the orders in the order details that have that product
+                List<OrderDetailsDTO> dtoOrdersDetails = db.OrderDetails.Where(x => x.ProductId == id).ToList();
+
+                if (dtoOrdersDetails != null)
+                {
+                    // Init a list of Orders
+                    List<OrderDTO> dtoOrders = new List<OrderDTO>();
+
+                    // Find all the orders in the order table accoring to the orderId and fill the dtoOrders list
+                    foreach (var orderDetails in dtoOrdersDetails)
+                    {
+                        dtoOrders = db.Orders.Where(x => x.OrderId == orderDetails.OrderId).ToList();
+                    }
+
+                    // Remove the orders from the Orders table
+                    foreach (var order in dtoOrders)
+                    {
+                        db.Orders.Remove(order);
+                    }
+
+                    // Remove the orders from the OrdersDetails table
+                    foreach (var orderDetails in dtoOrdersDetails)
+                    {
+                        db.OrderDetails.Remove(orderDetails);
+                    }
+
+                    db.SaveChanges();
+                }
+            }
+
         }
 
     }
