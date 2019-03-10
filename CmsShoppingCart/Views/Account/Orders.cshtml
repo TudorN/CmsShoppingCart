@@ -39,9 +39,16 @@
                         @Html.DisplayFor(modelItem => item.CreatedAt)
                     </td>
                     <td>
-                        @foreach (var item2 in item.ProductsAndQty)
+                        @if (item.ProductsAndQty.Count != 0)
                         {
-                            @item2.Key @:x @item2.Value
+                            foreach (var item2 in item.ProductsAndQty)
+                            {
+                                @item2.Key @:x @item2.Value
+                            }
+                        }
+                        else
+                        {
+                            <p>Product no longer available </p>
                         }
                     </td>
                     <td>

@@ -304,17 +304,21 @@ namespace CmsShoppingCart.Controllers
                                                .Where(x => x.Id == orderDetails.ProductId)
                                                .FirstOrDefault();
 
-                        // Get product price
-                        decimal price = product.Price;
+                        if (product != null)
+                        {
+                            // Get product price
+                            decimal price = product.Price;
 
-                        // Get product name
-                        string productName = product.Name;
+                            // Get product name
+                            string productName = product.Name;
 
-                        // Add to product dict
-                        productsAndQty.Add(productName, orderDetails.Quantity);
+                            // Add to product dict
+                            productsAndQty.Add(productName, orderDetails.Quantity);
 
-                        // Get total
-                        total += orderDetails.Quantity * price;
+                            // Get total
+                            total += orderDetails.Quantity * price;
+                        }
+                        
                     }
 
                     // Add to ordersForAdminVM list
