@@ -522,9 +522,46 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             // Delete product from DB
             using (Db db = new Db())
             {
+                // Find Product
                 ProductDTO dto = db.Products.Find(id);
+
+                // Find all the orders in the order details that have that product
+                List<OrderDetailsDTO> dtoOrdersDetails = db.OrderDetails.Where(x => x.ProductId == id).ToList();
+
+                if (dtoOrdersDetails != null)
+                {
+
+             
+                    // Init a list of Orders
+                    List<OrderDTO> dtoOrders = new List<OrderDTO>();
+
+                    // Find all the orders in the order table accoring to the orderId and fill the dtoOrders list
+                    foreach (var orderDetails in dtoOrdersDetails)
+                    {
+                        dtoOrders = db.Orders.Where(x => x.OrderId == orderDetails.OrderId).ToList();
+                    }
+
+
+                    // Remove the orders from the Orders table
+                    foreach (var order in dtoOrders)
+                    {
+                        db.Orders.Remove(order);
+                    }
+
+                    // Remove the orders from the OrdersDetails table
+                    foreach (var orderDetails in dtoOrdersDetails)
+                    {
+                        db.OrderDetails.Remove(orderDetails);
+                    }
+
+
+                }
+
+
+                // Delete product
                 db.Products.Remove(dto);
 
+                // Save
                 db.SaveChanges();
             }
 
