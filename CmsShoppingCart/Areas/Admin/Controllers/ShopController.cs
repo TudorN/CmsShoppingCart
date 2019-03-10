@@ -102,9 +102,7 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             using (Db db = new Db())
             {
 
-     
-
-
+  
                 // Get the category
                 CategoryDTO dtoCategory = db.Categories.Find(id);
 
@@ -119,6 +117,14 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
                     {
                         // Remove the product
                         db.Products.Remove(dtoProduct);
+
+                     
+                        // Delete product folder 
+                        var originalDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
+                        string pathString = Path.Combine(originalDirectory.ToString(), "Products\\" + dtoProduct.Id.ToString());
+
+                        if (Directory.Exists(pathString))
+                            Directory.Delete(pathString, true);
                     }
                     
                 }
@@ -533,8 +539,6 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             return RedirectToAction("Products");
             
 
-
-            return View();
         }
 
         // POST: Admin/Shop/SaveGalleryImages
