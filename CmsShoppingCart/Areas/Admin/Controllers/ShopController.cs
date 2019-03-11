@@ -664,7 +664,8 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             return View(ordersForAdmin);
         }
 
-        // GET: Admin/Shop/DeleteOrder/id
+        // POST: Admin/Shop/DeleteOrder/id
+        //[HttpPost] --- this will not work in this case
         public ActionResult DeleteOrder(int id)
         {
 

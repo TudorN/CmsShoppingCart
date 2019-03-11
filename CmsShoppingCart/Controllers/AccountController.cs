@@ -31,14 +31,14 @@ namespace CmsShoppingCart.Controllers
             }
 
             // Return view
-           return View();
+            return View();
         }
         // POST: /account/login
         [HttpPost]
         public ActionResult Login(LoginUserVM model)
         {
             // Check model state
-            if (! ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(model);
             }
@@ -48,14 +48,14 @@ namespace CmsShoppingCart.Controllers
 
             using (Db db = new Db())
             {
-                if (db.Users.Any(x => x.Username.Equals(model.Username) && 
-                                      x.Password.Equals(model.Password) ))
+                if (db.Users.Any(x => x.Username.Equals(model.Username) &&
+                                      x.Password.Equals(model.Password)))
                 {
                     isValid = true;
                 }
             }
 
-            if (! isValid)
+            if (!isValid)
             {
                 ModelState.AddModelError("", "Invalid username or password.");
                 return View(model);
@@ -226,7 +226,7 @@ namespace CmsShoppingCart.Controllers
                 string username = User.Identity.Name;
 
                 //Make sure username is unique
-                if (db.Users.Where(x => x.Id != model.Id).Any(x => x.Username ==  username))
+                if (db.Users.Where(x => x.Id != model.Id).Any(x => x.Username == username))
                 {
                     ModelState.AddModelError("", "Username " + model.Username + " already exists.");
                     model.Username = "";
@@ -237,7 +237,7 @@ namespace CmsShoppingCart.Controllers
                 // Edit dto
                 UserDTO dto = db.Users.Find(model.Id);
 
- 
+
 
                 dto.FirstName = model.FirstName;
                 dto.LastName = model.LastName;
@@ -252,7 +252,7 @@ namespace CmsShoppingCart.Controllers
 
                 // Save dto/db/changes
                 db.SaveChanges();
-             }
+            }
             //Set TempData message
             TempData["SM"] = "You have edited your profile!";
 
@@ -276,6 +276,7 @@ namespace CmsShoppingCart.Controllers
                 int userId = user.Id;
 
 
+
                 // Init list of OrderVM
                 List<OrderVM> orders = db.Orders.Where(x => x.UserId == userId).ToArray().Select(x => new OrderVM(x)).ToList();
 
@@ -295,7 +296,7 @@ namespace CmsShoppingCart.Controllers
                                                                .Where(x => x.OrderId == order.OrderId)
                                                                .ToList();
 
-                
+
                     // Loop trought list of OrderDetailsDTO
                     foreach (var orderDetails in orderDetailsList)
                     {
@@ -318,7 +319,7 @@ namespace CmsShoppingCart.Controllers
                             // Get total
                             total += orderDetails.Quantity * price;
                         }
-                        
+
                     }
 
                     // Add to ordersForAdminVM list
@@ -335,5 +336,34 @@ namespace CmsShoppingCart.Controllers
             return View(ordersForUser);
         }
 
-    }
+        // POST: /account/DeleteOrder/id    
+        public ActionResult DeleteOrder(int id)
+        {
+
+            using (Db db = new Db())
+            {
+                // Find the order in the Order table
+                OrderDTO dtoOrder = db.Orders.Find(id);
+
+                // Find all the orders in the order details that have that order id
+                List<OrderDetailsDTO> dtoOrdersDetails = db.OrderDetails.Where(x => x.OrderId == id).ToList();
+
+
+                // Remove the orders from the OrdersDetails table
+                foreach (var dtoOrderDetails in dtoOrdersDetails)
+                {
+                    db.OrderDetails.Remove(dtoOrderDetails);
+                }
+
+                // Remove order from the Order table
+                db.Orders.Remove(dtoOrder);
+
+                // Save the changes
+                db.SaveChanges();
+
+            }
+
+            return RedirectToAction("Orders");
+        }
+   }
 }

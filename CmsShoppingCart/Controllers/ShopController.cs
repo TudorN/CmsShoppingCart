@@ -99,5 +99,6 @@ namespace CmsShoppingCart.Controllers
             // Return view with model
             return View("ProductDetails", model);
         }
+
     }
 }
