@@ -664,28 +664,34 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             return View(ordersForAdmin);
         }
 
-        public void AdjustOrderHistory(int id)
+        // GET: Admin/Shop/DeleteOrder/id
+        public ActionResult DeleteOrder(int id)
         {
 
-            //using (Db db = new Db())
-            //{
-            //    // Find all the orders in the order details that have that product
-            //    List<OrderDetailsDTO> dtoOrdersDetails = db.OrderDetails.Where(x => x.ProductId == id).ToList();
+            using (Db db = new Db())
+            {
+                // Find the order in the Order table
+                OrderDTO dtoOrder = db.Orders.Find(id);
 
-            //    if (dtoOrdersDetails != null)
-            //    {
-                    
+                // Find all the orders in the order details that have that order id
+                List<OrderDetailsDTO> dtoOrdersDetails = db.OrderDetails.Where(x => x.OrderId == id).ToList();
 
-            //        // Remove the orders from the OrdersDetails table
-            //        //foreach (var orderDetails in dtoOrdersDetails)
-            //        //{
-            //        //    orderDetails.Products;
-            //        //}
+                              
+                // Remove the orders from the OrdersDetails table
+                foreach (var dtoOrderDetails in dtoOrdersDetails)
+                {
+                    db.OrderDetails.Remove(dtoOrderDetails);
+                }
 
-            //        db.SaveChanges();
-            //    }
-            //}
+                // Remove order from the Order table
+                db.Orders.Remove(dtoOrder);
 
+                // Save the changes
+                db.SaveChanges();
+                
+            }
+
+            return RedirectToAction("Orders");
         }
 
     }
