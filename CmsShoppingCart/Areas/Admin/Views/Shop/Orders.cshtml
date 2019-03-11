@@ -35,36 +35,60 @@ else
 
         @foreach (var item in Model)
         {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.OrderNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Username)
-            </td>
-            <td>
-                @if (item.ProductsAndQty.Count != 0)
-                {
-                    foreach (var item2 in item.ProductsAndQty)
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Username)
+                </td>
+                <td>
+                    @if (item.ProductsAndQty.Count != 0)
                     {
-                        @item2.Key @:x @item2.Value <br />
+                        foreach (var item2 in item.ProductsAndQty)
+                        {
+                            @item2.Key @:x @item2.Value <br />
+                        }
                     }
-                }
-                else
-                {
-                      <p> Product no longer available</p>
-                }
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-
-            <td>
-                $@Html.DisplayFor(modelItem => item.Total)
-            </td>
-        </tr>
+                    else
+                    {
+                        <p> Product no longer available</p>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedAt)
+                </td>
+                <td>
+                    $@Html.DisplayFor(modelItem => item.Total)
+                </td>
+                <td>
+                    @Html.ActionLink("Delete", "DeleteOrder", new { id = item.OrderNumber }, new { @class = "delete" })
+                </td>
+            </tr>
         }
 
     </table>
+
+}
+
+
+@section Scripts{
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+    <script>
+
+        $(function () {
+
+
+            /*
+            *Confirm order deletion
+            */
+
+            $("a.delete").click(function () {
+                if (!confirm("Confirm order deletion")) return false;
+            });
+
+            ////////////////////////////////////////////////////////////////////////////
+        })
+    </script>
 
 }

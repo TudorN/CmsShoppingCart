@@ -6,60 +6,82 @@
 
 <h2>Orders</h2>
 
-    @if (!Model.Any())
-    {
-        <h3 class="text-center">There are no orders.</h3>
-    }
-    else
-    {
-        <table class="table">
+@if (!Model.Any())
+{
+    <h3 class="text-center">There are no orders.</h3>
+}
+else
+{
+    <table class="table">
+        <tr>
+            <th>
+                OrderNumber
+            </th>
+            <th>
+                CreatedAt
+            </th>
+            <th>
+                Oreder Details
+            </th>
+            <th>
+                Total
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
             <tr>
-                <th>
-                    OrderNumber
-                </th>
-                <th>
-                    CreatedAt
-                </th>
-                <th>
-                    Oreder Details
-                </th>
-                <th>
-                    Total
-                </th>
-                <th></th>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedAt)
+                </td>
+                <td>
+                    @if (item.ProductsAndQty.Count != 0)
+                    {
+                        foreach (var item2 in item.ProductsAndQty)
+                        {
+                            @item2.Key @:x @item2.Value
+                        }
+                    }
+                    else
+                    {
+                        <p>Product no longer available </p>
+                    }
+                </td>
+                <td>
+                    $@Html.DisplayFor(modelItem => item.Total)
+                </td>
+                <td>
+                    @Html.ActionLink("Delete", "DeleteOrder","Account", new { id = item.OrderNumber }, new { @class = "delete" })
+                </td>
+
             </tr>
+        }
 
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.OrderNumber)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CreatedAt)
-                    </td>
-                    <td>
-                        @if (item.ProductsAndQty.Count != 0)
-                        {
-                            foreach (var item2 in item.ProductsAndQty)
-                            {
-                                @item2.Key @:x @item2.Value
-                            }
-                        }
-                        else
-                        {
-                            <p>Product no longer available </p>
-                        }
-                    </td>
-                    <td>
-                        $@Html.DisplayFor(modelItem => item.Total)
-                    </td>
+    </table>
 
-                </tr>
-            }
+}
 
-        </table>
+@section Scripts{
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+    <script>
 
-    }
+        $(function () {
 
-    
+
+            /*
+            *Confirm order deletion
+            */
+
+            $("a.delete").click(function () {
+                if (!confirm("Confirm order deletion")) return false;
+            });
+
+            ////////////////////////////////////////////////////////////////////////////
+        })
+    </script>
+
+}
