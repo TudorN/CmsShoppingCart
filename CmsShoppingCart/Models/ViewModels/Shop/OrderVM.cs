@@ -19,8 +19,8 @@ namespace CmsShoppingCart.Models.ViewModels.Shop
             CreatedAt = row.CreatedAt;
         }
 
-        public int OrderId { get; set; }
-        public int UserId { get; set; }
+        public int? OrderId { get; set; }
+        public int? UserId { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }
