@@ -23,6 +23,7 @@
         }
     }
 </select>
+Search <input type="text" name="name" value="" placeholder="search product name" />
 <br /><br />
 <p>
     @Html.ActionLink("Add New Product", "AddProduct")
@@ -49,6 +50,10 @@
 
     @foreach (var product in ViewBag.OnePageOfProducts)
     {
+        if (true)
+        {
+
+        }
         <tr>
             <td>
                 @product.Name
