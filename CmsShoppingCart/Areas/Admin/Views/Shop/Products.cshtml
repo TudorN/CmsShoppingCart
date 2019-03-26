@@ -10,7 +10,7 @@
 <h2>Products</h2>
 
 <select id="SelectCategory" name="SelectCategory">
-    <option value="0">All</option>
+    <option value="0">Select Category</option>
     @foreach (var item in ViewBag.Categories)
     {
         if (ViewBag.SelectedCat == item.Value)
@@ -23,7 +23,8 @@
         }
     }
 </select>
-Search <input type="text" name="name" value="" placeholder="search product name" />
+<input id="nameSearch" type="text" name="name" value="" placeholder="search product name" />
+<button id="searchButton">Search</button>
 <br /><br />
 <p>
     @Html.ActionLink("Add New Product", "AddProduct")
@@ -34,8 +35,8 @@ Search <input type="text" name="name" value="" placeholder="search product name"
             Name
         </th>
         @*<th>
-            @Html.DisplayNameFor(model => model.Slug)
-        </th>*@
+                @Html.DisplayNameFor(model => model.Slug)
+            </th>*@
         <th>
             Description
         </th>
@@ -47,73 +48,168 @@ Search <input type="text" name="name" value="" placeholder="search product name"
         </th>
         <th></th>
     </tr>
-
-    @foreach (var product in ViewBag.OnePageOfProducts)
+    @if (ViewBag.OnePageOfProducts.Count > 0)
     {
-        if (true)
+        foreach (var product in ViewBag.OnePageOfProducts)
         {
 
+            <tr>
+                <td>
+                    @product.Name
+                </td>
+                <td>
+                    @product.Description
+                </td>
+                <td>
+                    $@product.Price
+                </td>
+                <td>
+                    <a href="/admin/shop/EditProduct/@product.Id">
+                        <img src="/Images/Uploads/Products/@product.Id/Thumbs/@product.ImageName" />
+                    </a>
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "EditProduct", new { id = product.Id }) |
+                    @Html.ActionLink("Delete", "DeleteProduct", new { id = product.Id }, new { @class = "delete" })
+                </td>
+            </tr>
+
         }
-        <tr>
-            <td>
-                @product.Name
-            </td>
-            <td>
-                @product.Description
-            </td>
-            <td>
-                $@product.Price
-            </td>
-            <td>
-                <a href="/admin/shop/EditProduct/@product.Id">
-                    <img src="/Images/Uploads/Products/@product.Id/Thumbs/@product.ImageName" />
-                </a>
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "EditProduct", new { id = product.Id }) |
-                @Html.ActionLink("Delete", "DeleteProduct", new { id = product.Id }, new { @class = "delete"})
-            </td>
-        </tr>
 
     }
-
+    else
+    {
+        <tr><td>No results that match you're search criteria were found</td></tr>
+    }
 </table>
+@if (ViewBag.OnePageOfProducts.TotalItemCount > 3)
+{
+    @Html.PagedListPager((IPagedList)ViewBag.OnePageOfProducts, page => Url.Action("Products", new { page, catId = ViewBag.SelectedCat, Name = ViewBag.SearchedName }))
 
-@Html.PagedListPager((IPagedList)ViewBag.OnePageOfProducts, page => Url.Action("Products", new { page, catId = ViewBag.SelectedCat }))
+}
 
 
 @section Scripts{
     <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
     <script>
-            $(function () {
+        $(function () {
 
-                /*
-                 *Select products from specified category
-                 */
-                $("#SelectCategory").on("change", function () {
-                    var url = $(this).val();
+            /*
+             *Select products from specified category and check to see if there is also a name filter
+             */
+            $("#SelectCategory").on("change", function () {
+                var catUrl = $(this).val();
+                var nameUrl = $("#nameSearch");
 
-                    if (url) {
-                        window.location = "/admin/shop/Products?catId=" + url;
+                if (catUrl) {
+
+                    if (nameUrl.is(':placeholder-shown')) {
+                        window.location = "/admin/shop/Products?catId=" + catUrl;
                     }
+                    else {
 
-                    return false;
-                });
+                        window.location = "/admin/shop/Products?catId=" + catUrl + "&name=" + nameUrl.val();
+                    }
+                    
+                }
 
-
-                //////////////////////////////////////////////////////////////
-
-                /*
-                *Confirm product deletion
-                */
-
-
-                $("a.delete").click(function () {
-                    if (!confirm("Confirm product deletion")) return false;
-                });
-
-                //////////////////////////////////////////////////////////////
+                return false;
             });
+            //////////////////////////////////////////////////////////////////////////////////////
+
+            /*
+             * Search product by name via a search button and take into account the choosen category
+             */
+            $("#searchButton").on("click", function () {
+
+                sessionStorage.setItem("url", $("#nameSearch").val());
+                var nameUrl = $("#nameSearch").val();
+                var catUrl = $("#SelectCategory");
+
+                if (nameUrl) {
+                    if (catUrl.children("option:selected").val() == 0) {
+                        window.location = "/admin/shop/Products?name=" + nameUrl;
+                    }
+                    else {
+                        window.location = "/admin/shop/Products?name=" + nameUrl + "&catId=" + catUrl.val();
+                    }
+                }
+                else {
+                    window.location = "/admin/shop/Products";
+                }
+
+                return false;
+
+            });
+            $("#nameSearch").val(sessionStorage.getItem("url"));
+            //////////////////////////////////////////////////////////////////////
+
+
+            /*
+             *Select products by name.Dynamic search. NOT A GOOD APPROACH - to many round trips to the server.
+             */
+            //$("#nameSearch").on("keyup", function () {
+
+            //    //Clear the session storage
+            //    if ($(this).is(':placeholder-shown')) {
+            //        sessionStorage.clear();
+            //    }
+
+            //    // if it's the first sesion
+            //    if (sessionStorage.getItem("url") == null) {
+            //        sessionStorage.setItem("url", $(this).val());
+            //    }
+            //    else {
+            //        //load old Value and concatenate it with the new value. load that into the session storage
+            //        sessionStorage.setItem("url", sessionStorage.getItem("url") + $(this).val()
+            //                                                                             .toString()
+            //                                                                             .replace(sessionStorage.getItem("url"), ''));
+            //    }
+
+            //    // load sessionStorage
+            //    var url = sessionStorage.getItem("url");
+
+
+            //    if (url) {
+            //        window.location = "/admin/shop/Products?name=" + url;
+            //    }
+            //    else {
+
+            //        window.location = "/admin/shop/Products";
+            //        return false;
+            //    }
+
+            //});
+
+
+
+            ////Set the text input value
+            //$("#nameSearch").val(sessionStorage.getItem("url"));
+            ////Focus on the input after every refresh
+            //$("#nameSearch").focus();
+
+
+
+
+
+
+
+
+
+            //////////////////////////////////////////////////////////////
+
+            /*
+            *Confirm product deletion
+            */
+
+
+
+            $("a.delete").click(function () {
+                if (!confirm("Confirm product deletion")) return false;
+            });
+
+            //////////////////////////////////////////////////////////////
+        });
     </script>
 
 }

@@ -4,6 +4,7 @@ using CmsShoppingCart.Models.ViewModels.Shop;
 using PagedList;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -330,7 +331,7 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
         }
 
         // GET: Admin/Shop/Products
-        public ActionResult Products(int? page, int? catId)
+        public ActionResult Products(int? page, int? catId, string name)
         {
             // Declare a list of ProductVM
             List<ProductVM> listOfProductVM;
@@ -338,19 +339,40 @@ namespace CmsShoppingCart.Areas.Admin.Controllers
             // Set page number
             var pageNumber = page ?? 1;
 
+            // Init filtered list of products
+            
             using (Db db = new Db())
             {
-                // Init the list
-                listOfProductVM = db.Products.ToArray()
-                                     .Where(x => catId == null || catId == 0 || x.CategoryId == catId)
-                                     .Select(x => new ProductVM(x))
-                                     .ToList();
+
+
+
+
+                if (name != null && name != "")
+                {
+                    // Init the list
+                    listOfProductVM = db.Products.ToArray()
+                                         .Where(x => x.Name.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0 && (catId == null || catId == 0 || x.CategoryId == catId))
+                                         .Select(x => new ProductVM(x))
+                                         .ToList();
+                }
+                else{
+                    // Init the list
+                    listOfProductVM = db.Products.ToArray()
+                                         .Where(x => catId == null || catId == 0 || x.CategoryId == catId)
+                                         .Select(x => new ProductVM(x))
+                                         .ToList();
+                }
+
+
 
                 // Populate categories select list
                 ViewBag.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
 
                 // Set selected category
                 ViewBag.SelectedCat = catId.ToString();
+
+                // Set searched name
+                ViewBag.SearchedName = name;
             }
 
             // Set pagination
