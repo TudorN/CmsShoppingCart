@@ -8,8 +8,9 @@
 @using PagedList;
 
 <h2>Products</h2>
-
-<select id="SelectCategory" name="SelectCategory">
+<button id="searchButton">Search</button>
+<input id="nameSearch" type="text" name="name" value="" placeholder="search product name" />
+<select id="SelectCategory" name="SelectCategory" style="position:absolute">
     <option value="0">Select Category</option>
     @foreach (var item in ViewBag.Categories)
     {
@@ -23,8 +24,8 @@
         }
     }
 </select>
-<input id="nameSearch" type="text" name="name" value="" placeholder="search product name" />
-<button id="searchButton">Search</button>
+
+
 <br /><br />
 <p>
     @Html.ActionLink("Add New Product", "AddProduct")
@@ -95,44 +96,27 @@
         $(function () {
 
             /*
-             *Select products from specified category and check to see if there is also a name filter
-             */
-            $("#SelectCategory").on("change", function () {
-                var catUrl = $(this).val();
-                var nameUrl = $("#nameSearch");
-
-                if (catUrl) {
-
-                    if (nameUrl.is(':placeholder-shown')) {
-                        window.location = "/admin/shop/Products?catId=" + catUrl;
-                    }
-                    else {
-
-                        window.location = "/admin/shop/Products?catId=" + catUrl + "&name=" + nameUrl.val();
-                    }
-                    
-                }
-
-                return false;
-            });
-            //////////////////////////////////////////////////////////////////////////////////////
-
-            /*
-             * Search product by name via a search button and take into account the choosen category
+             * Search for products according filters
              */
             $("#searchButton").on("click", function () {
 
-                sessionStorage.setItem("url", $("#nameSearch").val());
-                var nameUrl = $("#nameSearch").val();
-                var catUrl = $("#SelectCategory");
+                sessionStorage.setItem("nameSearch", $("#nameSearch").val());
+                sessionStorage.setItem("SelectCategory", $("#SelectCategory").val());
 
-                if (nameUrl) {
-                    if (catUrl.children("option:selected").val() == 0) {
-                        window.location = "/admin/shop/Products?name=" + nameUrl;
-                    }
-                    else {
-                        window.location = "/admin/shop/Products?name=" + nameUrl + "&catId=" + catUrl.val();
-                    }
+                var productNameToSearch = $("#nameSearch");
+                var selectedCategory = $("#SelectCategory");
+
+                if (!productNameToSearch.is(':placeholder-shown') && selectedCategory.children("option:selected").val() != 0) {//filter on name and cat
+
+                    window.location = "/admin/shop/Products?name=" + productNameToSearch.val() + "&catId=" + selectedCategory.val();
+                }
+                else if (productNameToSearch.is(':placeholder-shown') && selectedCategory.children("option:selected").val() != 0) {//filter on cat
+
+                    window.location = "/admin/shop/Products?catId=" + selectedCategory.val();
+                }
+                else if (!productNameToSearch.is(':placeholder-shown') && selectedCategory.children("option:selected").val() == 0) { //filter on name
+
+                    window.location = "/admin/shop/Products?name=" + productNameToSearch.val();
                 }
                 else {
                     window.location = "/admin/shop/Products";
@@ -141,8 +125,59 @@
                 return false;
 
             });
-            $("#nameSearch").val(sessionStorage.getItem("url"));
-            //////////////////////////////////////////////////////////////////////
+            $("#nameSearch").val(sessionStorage.getItem("nameSearch"));
+            $("#SelectCategory").val(sessionStorage.getItem("SelectCategory"));
+
+
+            /*
+             *Select products from specified category and check to see if there is also a name filter
+             */
+            //$("#SelectCategory").on("change", function () {
+            //    var catUrl = $(this).val();
+            //    var nameUrl = $("#nameSearch");
+
+            //    if (catUrl) {
+
+            //        if (nameUrl.is(':placeholder-shown')) {
+            //            window.location = "/admin/shop/Products?catId=" + catUrl;
+            //        }
+            //        else {
+
+            //            window.location = "/admin/shop/Products?catId=" + catUrl + "&name=" + nameUrl.val();
+            //        }
+                    
+            //    }
+
+            //    return false;
+            //});
+            ////////////////////////////////////////////////////////////////////////////////////////
+
+            /*
+             * Search product by name via a search button and take into account the choosen category
+             */
+            //$("#searchButton").on("click", function () {
+
+            //    sessionStorage.setItem("url", $("#nameSearch").val());
+            //    var nameUrl = $("#nameSearch").val();
+            //    var catUrl = $("#SelectCategory");
+
+            //    if (nameUrl) {
+            //        if (catUrl.children("option:selected").val() == 0) {
+            //            window.location = "/admin/shop/Products?name=" + nameUrl;
+            //        }
+            //        else {
+            //            window.location = "/admin/shop/Products?name=" + nameUrl + "&catId=" + catUrl.val();
+            //        }
+            //    }
+            //    else {
+            //        window.location = "/admin/shop/Products";
+            //    }
+
+            //    return false;
+
+            //});
+            //$("#nameSearch").val(sessionStorage.getItem("url"));
+            ////////////////////////////////////////////////////////////////////////
 
 
             /*
