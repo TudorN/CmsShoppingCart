@@ -81,3 +81,13 @@ form.paypalform {
     color: #14479c !important;
     background-image: none !important;
 }
+#SelectCategory {
+    height: 30px;
+    left: 80%;
+}
+#nameSearch {
+    height:30px;
+}
+#searchButton {
+    height: 30px;
+}

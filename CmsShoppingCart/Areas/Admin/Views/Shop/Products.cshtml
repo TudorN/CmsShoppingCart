@@ -126,7 +126,10 @@
 
             });
             $("#nameSearch").val(sessionStorage.getItem("nameSearch"));
-            $("#SelectCategory").val(sessionStorage.getItem("SelectCategory"));
+            if (sessionStorage.getItem("SelectCategory") == "") {
+                $("#SelectCategory").val(sessionStorage.getItem("SelectCategory"));
+            }
+            
 
 
             /*
