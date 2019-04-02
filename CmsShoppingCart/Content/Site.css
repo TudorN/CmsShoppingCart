@@ -82,12 +82,18 @@ form.paypalform {
     background-image: none !important;
 }
 #SelectCategory {
-    height: 30px;
+    height: 33px;
+    display: inline;
     left: 80%;
+    width: 140px;
 }
+
 #nameSearch {
-    height:30px;
+    height: 33px;
+    width: 200px;
+    display: inline;
 }
+
 #searchButton {
-    height: 30px;
+    height: 33px;
 }

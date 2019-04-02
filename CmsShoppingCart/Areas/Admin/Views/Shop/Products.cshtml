@@ -8,9 +8,9 @@
 @using PagedList;
 
 <h2>Products</h2>
-<button id="searchButton">Search</button>
-<input id="nameSearch" type="text" name="name" value="" placeholder="search product name" />
-<select id="SelectCategory" name="SelectCategory" style="position:absolute">
+<button id="searchButton" class="btn btn-primary">Search</button>
+<input id="nameSearch" type="text" name="name" value="" placeholder="search product name" class="form-control" />
+<select id="SelectCategory" name="SelectCategory" style="position:absolute" class="form-control" >
     <option value="0">Select Category</option>
     @foreach (var item in ViewBag.Categories)
     {
